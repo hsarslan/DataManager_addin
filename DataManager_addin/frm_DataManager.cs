@@ -26,7 +26,7 @@ namespace DataManager_addin
         {
             InitializeComponent();
             this.Hook = hook;
-            initialize();
+            
         }
 
         /// <summary>
@@ -66,70 +66,7 @@ namespace DataManager_addin
 
         }
 
-        private void initialize()
-        {
-            
-        }
-        private void button1_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                //iterateToolbars();
-                //removeDW("{318BD39C-284F-4771-8957-8958FD8FA295}", false);
-                textBox1.Text += "Hiding all toolbars.";
-                textBox1.Text += Environment.NewLine;
-                ICommandBars commandBars = ArcCatalog.Application.Document.CommandBars;
-                commandBars.HideAllToolbars();
-                textBox1.Text += "All toolbars hided.";
-                textBox1.Text += Environment.NewLine;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-
-        }
-        public ICommandBar GetToolbarByName(IApplication application, System.String toolbarName)
-        {
-            try
-            {
-                ICommandBars commandBars = application.Document.CommandBars;
-                UID barID = new UIDClass();
-                barID.Value = toolbarName; // Example: "esriArcMapUI.StandardToolBar"
-                ICommandItem commandItem = commandBars.Find(barID, false, false);
-                if (commandItem != null && commandItem.Type == esriCommandTypes.esriCmdTypeToolbar)
-                {
-                    return (ESRI.ArcGIS.Framework.ICommandBar)commandItem;
-                }
-                else
-                    return null;
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show("Failed to load toolbar: " + toolbarName + Environment.NewLine + ex.Message);
-                return null;
-            }
-        }
-
-        private void showCommandBar(UID commandbarID)
-        {
-            try
-            {
-                ICommandBars commandBars = ArcCatalog.Document.CommandBars;
-
-                ICommandItem commandItem = commandBars.Find(commandbarID, false, false);
-                if (commandItem != null && commandItem.Type == esriCommandTypes.esriCmdTypeToolbar)
-                {
-                    ICommandBar cb = (ICommandBar)commandItem;
-                    cb.Dock(esriDockFlags.esriDockShow);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to show commandbar: " + commandbarID + Environment.NewLine + ex.Message);
-            }
-        }
+        
 
         public IDockableWindow GetDockableWindow(System.String windowName)
         {
@@ -147,24 +84,13 @@ namespace DataManager_addin
             }
         }
 
-        private IGPTool getGPTool (System.String toolName)
+        private void setDWVisibility(string dwName, bool visibility)
         {
-            IGPTool pTool = null;
-            try
-            {
-                UID pUID = new UIDClass();
-                pUID.Value = "esriGeoprocessingUI.ArcToolboxExtension";
-                IArcToolboxExtension pATBExt = (IArcToolboxExtension)ArcCatalog.Application.FindExtensionByCLSID(pUID);
-
-                IArcToolbox pAtb = pATBExt.ArcToolbox;
-                pTool = pAtb.GetToolbyNameString(toolName);
-            }
-            catch (System.Runtime.InteropServices.COMException ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            return pTool;
-
+            //this.Enabled = true;
+            //UID dockWinID = new UIDClass();
+            //dockWinID.Value = @dwName;
+            IDockableWindow s_dockWindow = GetDockableWindow(dwName);
+            if (s_dockWindow != null) s_dockWindow.Show(visibility);
         }
 
         public void FindCommandAndExecute(System.String commandName)
@@ -216,8 +142,6 @@ namespace DataManager_addin
 
                         if (commandBar != null)
                         {
-                            //comboBox1.Items.Add(toolbarDef.Caption);
-
 
                         }
 
@@ -233,172 +157,114 @@ namespace DataManager_addin
             }
         }
 
-        #region Data Storage & Loading Buttons
-        private void btn_ManageData_Click(object sender, EventArgs e)
+        public ICommandBar GetToolbarByName(IApplication application, System.String toolbarName)
         {
-            setRootObjects(true, true, true, true, true, true, true);
-            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Data Management Tools.tbx");
-        }
-
-        private void btn_DataMigration_Click(object sender, EventArgs e)
-        {
-            setRootObjects(false, true, false, false, false, false, false);
-            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Conversion Tools.tbx");
-        }
-
-        private void btn_ConnectDatabase_Click(object sender, EventArgs e)
-        {
-            setRootObjects(false, false, true, true, false, false, false);
-        }
-
-        private void btn_Search_Click(object sender, EventArgs e)
-        {
-            setRootObjects(false, false, false, false, false, false, false);
-            
-            IDockableWindow pdw = GetDockableWindow("{D949DEFF-85E0-47DB-B533-CB2BE6C631CB}"); //"esriCatalogUI.SearchDockableWindow"
-            if (pdw != null)
-            {
-                pdw.Show(!pdw.IsVisible());
-                
-            }
-        }
-
-        private void btn_ImpExp_Click(object sender, EventArgs e)
-        {
-            setRootObjects(false, true, false, false, false, false, false);
-            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Conversion Tools.tbx");
-            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Data Interoperability Tools.tbx");
-        }
-
-        private void btn_SupportFormats_Click(object sender, EventArgs e)
-        {
-            setRootObjects(false, true, false, false, false, false, false);
-            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Conversion Tools.tbx");
-            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Data Interoperability Tools.tbx");
-        }
-
-        private void btn_Projection_Click(object sender, EventArgs e)
-        {
-            setRootObjects(false, true, false, false, false, false, false);
-            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Data Management Tools.tbx\\Projections and Transformations");
-        }
-
-        private void btn_Attachments_Click(object sender, EventArgs e)
-        {
-            setRootObjects(false, true, false, false, false, false, false);
-            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Data Management Tools.tbx\\Attachments");
-        }
-
-        #endregion
-
-        private void setDWVisibility(string dwName, bool visibility)
-        {
-            //this.Enabled = true;
-            //UID dockWinID = new UIDClass();
-            //dockWinID.Value = @dwName;
-            IDockableWindow s_dockWindow = GetDockableWindow(dwName);
-            if (s_dockWindow != null) s_dockWindow.Show(visibility);
-        }
-
-
-
-        private void toggleToolboxWindow(bool makeVisible)
-        {
-            //FindCommandAndExecute("esriGeoprocessingUI.ArcToolboxCmd");
-            IDockableWindow pdw = GetDockableWindow("esriGeoprocessingUI.ArcToolboxDockWnd");
-            if (pdw != null)
-            {
-                if (makeVisible) pdw.Show(true);
-                else pdw.Show(!pdw.IsVisible());
-            }
-        }
-        private IGxObject navigateToCatalogObject(System.String objectPath)
-        {
-            IGxObject gxObj = null;
-            IGxSelection gxSel = null;
             try
             {
-                IGxApplication gxApp = ArcCatalog.Application as IGxApplication;
-                gxApp.Location = objectPath;
-                gxSel = gxApp.Selection;
-                if (gxSel != null)
+                ICommandBars commandBars = application.Document.CommandBars;
+                UID barID = new UIDClass();
+                barID.Value = toolbarName; // Example: "esriArcMapUI.StandardToolBar"
+                ICommandItem commandItem = commandBars.Find(barID, false, false);
+                if (commandItem != null && commandItem.Type == esriCommandTypes.esriCmdTypeToolbar)
                 {
-                    gxObj = gxSel.Location;
-                    if (gxObj != null)
-                    {
-                        if (gxObj is IGxObjectContainer)
-                        {
-                            IGxObjectContainer gxObjCont = null;
-                            IEnumGxObject gxEnum = null;
-                            IGxObject gxObject = null;
-                            gxObjCont = gxObj as IGxObjectContainer;
-                            gxEnum = gxObjCont.Children;
-                            if (gxEnum != null)
-                            {
-                                gxObject = gxEnum.Next();
-                                gxApp.Location = gxObject.FullName;
-                                if (gxObject is IGxObjectContainer) gxApp.ExpandSelection();
-                                gxApp.Location = gxObj.FullName;
-                            }
-                        }
-                    }
+                    return (ESRI.ArcGIS.Framework.ICommandBar)commandItem;
+                }
+                else
+                    return null;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Failed to load toolbar: " + toolbarName + Environment.NewLine + ex.Message);
+                return null;
+            }
+        }
+
+        private void showCommandBar(UID commandbarID)
+        {
+            try
+            {
+                ICommandBars commandBars = ArcCatalog.Document.CommandBars;
+
+                ICommandItem commandItem = commandBars.Find(commandbarID, false, false);
+                if (commandItem != null && commandItem.Type == esriCommandTypes.esriCmdTypeToolbar)
+                {
+                    ICommandBar cb = (ICommandBar)commandItem;
+                    cb.Dock(esriDockFlags.esriDockShow);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to locate catalog object: " + objectPath + Environment.NewLine + ex.Message);
-                return null;
+                MessageBox.Show("Failed to show commandbar: " + commandbarID + Environment.NewLine + ex.Message);
             }
-            return gxObj;
         }
-
+        
+        
+        #region Catalog Tree Functions (GxObject)
         private void setRootObjects(bool isFolderConnection, bool isToolboxes, bool isDatabaseServers, bool isDatabaseConnections, bool isGISServers, bool isMyHostedServices, bool isReadyToUseServices)
         {
             try
             {
                 IGxApplication gxApp = ArcCatalog.Application as IGxApplication;
                 IGxCatalog gxCat = gxApp.Catalog;
+                if (gxCat == null)
+                {
+                    MessageBox.Show("Falied to set catalog object.");
+                    return;
+                }
                 IGxCatalogAdmin gxAdmin = (IGxCatalogAdmin)gxCat;
-
-                for (int i = 0; i < gxAdmin.RootObjectCount - 1; i++)
+                if (gxAdmin == null)
+                {
+                    MessageBox.Show("Falied to set catalog admin object.");
+                    return;
+                }
+                for (int i = 0; i < gxAdmin.RootObjectCount; i++)
                 {
                     IGxObject pobj = gxAdmin.get_RootObject(i);
                     //MessageBox.Show(pobj.FullName);
-                    //if (pobj is GxFolderConnections) gxAdmin.EnableRootObject(i, isFolderConnection);
-                    //else if (pobj is IGxToolbox) gxAdmin.EnableRootObject(i, isToolboxes);
-                    //else if (pobj is IGxdata) gxAdmin.EnableRootObject(i, isDatabaseServers);
-                    //else if (pobj is IGxRemoteDatabaseFolder) gxAdmin.EnableRootObject(i, isDatabaseConnections);
-                    //else if (pobj is IGxGISServersFolder) gxAdmin.EnableRootObject(i, isGISServers);
-                    //else if (pobj is IGxMyHostedMapsFolder) gxAdmin.EnableRootObject(i, isMyHostedServices);
-                    //else if (pobj is IGxTaskServicesRootFolder) gxAdmin.EnableRootObject(i, isReadyToUseServices);
-                    //else gxAdmin.EnableRootObject(i, false);
-                    switch (pobj.BaseName)
+                    if (pobj != null)
                     {
-                        case "Folder Connections":
-                            gxAdmin.EnableRootObject(i, isFolderConnection);
-                            break;
-                        case "Toolboxes":
-                            gxAdmin.EnableRootObject(i, isToolboxes);
-                            break;
-                        case "Database Servers":
-                            gxAdmin.EnableRootObject(i, isDatabaseServers);
-                            break;
-                        case "Database Connections":
-                            gxAdmin.EnableRootObject(i, isDatabaseConnections);
-                            break;
-                        case "GIS Servers":
-                            gxAdmin.EnableRootObject(i, isGISServers);
-                            break;
-                        case "My Hosted Services":
-                            gxAdmin.EnableRootObject(i, isMyHostedServices);
-                            break;
-                        case "Ready-To-Use Services":
-                            gxAdmin.EnableRootObject(i, isReadyToUseServices);
-                            break;
-                        default:
-                            gxAdmin.EnableRootObject(i, false);
-                            break;
+                        //if (pobj is IGxToolbox) gxAdmin.EnableRootObject(i, isToolboxes);
+                        //else if (pobj is IGxRemoteDatabaseFolder) gxAdmin.EnableRootObject(i, isDatabaseConnections);
+                        //else if (pobj is IGxGISServersFolder) gxAdmin.EnableRootObject(i, isGISServers);
+                        //else if (pobj is IGxMyHostedMapsFolder) gxAdmin.EnableRootObject(i, isMyHostedServices);
+                        //else if (pobj is IGxTaskServicesRootFolder) gxAdmin.EnableRootObject(i, isReadyToUseServices);
+                        //else if (pobj is IGxFolderConnections) gxAdmin.EnableRootObject(i, isFolderConnection);
+                        //else if (pobj is IGxc) gxAdmin.EnableRootObject(i, isDatabaseServers);
+                        //else gxAdmin.EnableRootObject(i, false);
+                        switch (pobj.BaseName)
+                        {
+                            case "Folder Connections":
+                                gxAdmin.EnableRootObject(i, isFolderConnection);
+                                break;
+                            case "Toolboxes":
+                                gxAdmin.EnableRootObject(i, isToolboxes);
+                                break;
+                            case "Database Servers":
+                                gxAdmin.EnableRootObject(i, isDatabaseServers);
+                                break;
+                            case "Database Connections":
+                                gxAdmin.EnableRootObject(i, isDatabaseConnections);
+                                break;
+                            case "GIS Servers":
+                                gxAdmin.EnableRootObject(i, isGISServers);
+                                break;
+                            case "My Hosted Services":
+                                gxAdmin.EnableRootObject(i, isMyHostedServices);
+                                break;
+                            case "Ready-To-Use Services":
+                                gxAdmin.EnableRootObject(i, isReadyToUseServices);
+                                break;
+                            default:
+                                gxAdmin.EnableRootObject(i, false);
+                                break;
+                        }
+                        
                     }
+                    else
+                    {
+                        //MessageBox.Show("Failed to load root object: " + i + " 'th of " + gxAdmin.RootObjectCount);
+                    }
+                
                 }
                 gxAdmin.RefreshRootObjects();
             }
@@ -442,6 +308,81 @@ namespace DataManager_addin
                 return null;
             }
         }
+        private IGxObject navigateToCatalogObject(System.String objectPath)
+        {
+            IGxObject gxObj = null;
+            IGxSelection gxSel = null;
+            try
+            {
+                IGxApplication gxApp = ArcCatalog.Application as IGxApplication;
+                gxApp.Location = objectPath;
+                gxSel = gxApp.Selection;
+                if (gxSel != null)
+                {
+                    gxObj = gxSel.Location;
+                    if (gxObj != null)
+                    {
+                        if (gxObj is IGxObjectContainer)
+                        {
+                            IGxObjectContainer gxObjCont = null;
+                            IEnumGxObject gxEnum = null;
+                            IGxObject gxObject = null;
+                            gxObjCont = gxObj as IGxObjectContainer;
+                            gxEnum = gxObjCont.Children;
+                            if (gxEnum != null)
+                            {
+                                gxObject = gxEnum.Next();
+                                gxApp.Location = gxObject.FullName;
+                                if (gxObject is IGxObjectContainer) gxApp.ExpandSelection();
+                                gxApp.Location = gxObj.FullName;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to locate catalog object: " + objectPath + Environment.NewLine + ex.Message);
+                return null;
+            }
+            return gxObj;
+        }
+
+        #endregion
+ 
+        #region Toolbox functions
+
+        
+        private void toggleToolboxWindow(bool makeVisible)
+        {
+            //FindCommandAndExecute("esriGeoprocessingUI.ArcToolboxCmd");
+            IDockableWindow pdw = GetDockableWindow("esriGeoprocessingUI.ArcToolboxDockWnd");
+            if (pdw != null)
+            {
+                if (makeVisible) pdw.Show(true);
+                else pdw.Show(!pdw.IsVisible());
+            }
+        }
+        
+        private IGPTool getGPTool(System.String toolName)
+        {
+            IGPTool pTool = null;
+            try
+            {
+                UID pUID = new UIDClass();
+                pUID.Value = "esriGeoprocessingUI.ArcToolboxExtension";
+                IArcToolboxExtension pATBExt = (IArcToolboxExtension)ArcCatalog.Application.FindExtensionByCLSID(pUID);
+
+                IArcToolbox pAtb = pATBExt.ArcToolbox;
+                pTool = pAtb.GetToolbyNameString(toolName);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            return pTool;
+
+        }
 
         private void runTool(System.String toolname)
         {
@@ -461,7 +402,43 @@ namespace DataManager_addin
             }
         }
 
-        private void btn_DeactivateViews_Click(object sender, EventArgs e)
+        private void runTool(IGxObject gxObj)
+        {
+            try
+            {
+                if (gxObj == null) return;
+                if (gxObj is IGxGPTool)
+                {
+                    IGxGPTool gxGPTool = (IGxGPTool)gxObj;
+                    IGPTool gpTool = gxGPTool.Tool;
+                    runTool(gpTool.Name);
+                }
+                else if (gxObj is GxAddGDSConnection)
+                {
+                    IGxObjectWizard gxWiz = (IGxObjectWizard)gxObj;
+                    gxWiz.Invoke(ArcCatalog.Application.hWnd);
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        private void runSelectedTool()
+        {
+            IGxApplication gxApp = ArcCatalog.Application as IGxApplication;
+            IGxCatalog gxCat = gxApp.Catalog;
+            IGxSelection gxSel = gxApp.Selection;
+            if (gxSel != null)
+            {
+                IGxObject gxObj = gxSel.Location;
+                runTool(gxObj);
+            }
+        }
+
+        #endregion
+
+        private void DeactivateViews()
         {
             IGxViewContainer pGxViewContainer = (IGxViewContainer)ArcCatalog.ThisApplication;
 
@@ -478,7 +455,7 @@ namespace DataManager_addin
 
         }
 
-        private void btn_ActivateViews_Click(object sender, EventArgs e)
+        private void ActivateViews()
         {
             IGxViewContainer pGxViewContainer = (IGxViewContainer)ArcCatalog.ThisApplication;
             IGxApplication gxApp = ArcCatalog.Application as IGxApplication;
@@ -519,6 +496,88 @@ namespace DataManager_addin
                 return null;
             }
         }
+
+
+        #region Data Storage & Loading Buttons
+        private void btn_ManageData_Click(object sender, EventArgs e)
+        {
+            setRootObjects(true, true, true, true, true, true, true);
+            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Data Management Tools.tbx");
+        }
+
+        private void btn_DataMigration_Click(object sender, EventArgs e)
+        {
+            setRootObjects(false, true, false, false, false, false, false);
+            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Conversion Tools.tbx\\To Geodatabase\\CAD to Geodatabase");
+            runSelectedTool();
+        }
+
+        private void btn_ConnectDatabase_Click(object sender, EventArgs e)
+        {
+            setRootObjects(false, false, true, true, false, false, false);
+            navigateToCatalogObject("Database Connections\\Add Database Connection");
+            runSelectedTool();
+
+        }
+
+        private void btn_Search_Click(object sender, EventArgs e)
+        {
+            setRootObjects(false, false, false, false, false, false, false);
+
+            IDockableWindow pdw = GetDockableWindow("{D949DEFF-85E0-47DB-B533-CB2BE6C631CB}"); //"esriCatalogUI.SearchDockableWindow"
+            if (pdw != null)
+            {
+                pdw.Show(!pdw.IsVisible());
+
+            }
+        }
+
+        private void btn_ImpExp_Click(object sender, EventArgs e)
+        {
+            setRootObjects(false, true, false, false, false, false, false);
+            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Conversion Tools.tbx");
+            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Data Interoperability Tools.tbx");
+        }
+
+        private void btn_SupportFormats_Click(object sender, EventArgs e)
+        {
+            setRootObjects(false, true, false, false, false, false, false);
+            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Data Interoperability Tools.tbx");
+            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Conversion Tools.tbx\\To CAD\\Export to CAD");
+            runSelectedTool();
+        }
+
+        private void btn_Projection_Click(object sender, EventArgs e)
+        {
+            setRootObjects(false, true, false, false, false, false, false);
+            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Data Management Tools.tbx\\Projections and Transformations\\Convert Coordinate Notation");
+            runSelectedTool();
+        }
+
+        private void btn_Attachments_Click(object sender, EventArgs e)
+        {
+            setRootObjects(false, true, false, false, false, false, false);
+            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Data Management Tools.tbx\\Attachments\\Add Attachments");
+            runSelectedTool();
+        }
+
+        private void btn_MakeFLayer_Click(object sender, EventArgs e)
+        {
+            setRootObjects(true, true, true, true, true, true, true);
+            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Data Management Tools.tbx\\Layers and Table Views\\Make Feature layer");
+            runSelectedTool();
+        }
+
+        private void btnCreateFClass_Click(object sender, EventArgs e)
+        {
+            setRootObjects(true, true, true, true, true, true, true);
+            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Data Management Tools.tbx\\Feature Class\\Create Feature Class");
+            runSelectedTool();
+        }
+
+
+        #endregion
+
         #region Metadata Buttons
         private void btn_GenerateMetadata_Click(object sender, EventArgs e)
         {
@@ -539,12 +598,16 @@ namespace DataManager_addin
             setRootObjects(true, true, true, true, true, false, false);
             navigateToCatalogObject("Toolboxes\\System Toolboxes\\Conversion Tools.tbx\\Metadata\\ESRI Metadata Translator");
             IGxDocumentationView docView = setActiveView_GxDocumentationView();
+
+            
             
         }
 
         private void btn_InternetMetadataService_Click(object sender, EventArgs e)
         {
-
+            setRootObjects(false, true, false, false, false, false, false);
+            navigateToCatalogObject("Toolboxes\\System Toolboxes\\Conversion Tools.tbx\\Metadata\\Metadata Publisher");
+            setActiveView_GxDocumentationView();
         }
 
         private void btn_DisplayISOMetadata_Click(object sender, EventArgs e)
@@ -581,12 +644,6 @@ namespace DataManager_addin
             //show form
             frm.ShowDialog();
         }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            textBox1.Clear();
-        }
-
 
     }
 }

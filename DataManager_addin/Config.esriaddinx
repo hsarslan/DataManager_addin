@@ -2,7 +2,7 @@
   <Name>Data Manager</Name>
   <AddInID>{f9506e1c-9c07-4a3f-8516-b8c52c36304f}</AddInID>
   <Description>Type in a description for this Add-in.</Description>
-  <Version>1.4</Version>
+  <Version>1.7</Version>
   <Image>Images\DataManager_addin.png</Image>
   <Author>Süleyman</Author>
   <Company></Company>
